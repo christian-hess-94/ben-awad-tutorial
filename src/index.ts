@@ -1,3 +1,5 @@
+import { PostResolver } from "./resolvers/post";
+import "reflect-metadata";
 // import { Post } from "./entities/Post";
 import { MikroORM } from "@mikro-orm/core";
 import { __prod__ } from "./constants";
@@ -8,15 +10,18 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 
 const main = async () => {
-  console.log("Hello tu");
+  console.clear();
   const orm = await MikroORM.init(microConfig);
   orm.getMigrator().up(); //executa migrations pendentes
+
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver],
+      resolvers: [HelloResolver, PostResolver],
       validate: false,
     }),
+    context: () => ({ em: orm.em }), //Passa o contexto do MikroORM para dentro do contexto do Apollo GraphQL (para usar nos reducers)
   });
+
   const app = express();
   apolloServer.applyMiddleware({ app });
   app.listen(4000, () =>
