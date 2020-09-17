@@ -1,6 +1,27 @@
 ## MikroORM
 
 <details>
+<summary>Conectando ao banco de dados</summary>
+
+- Abra o arquivo `mikro-orm.config.ts`
+- Especifique o `host` e `port` do banco de dados
+
+  - Caso esteja localhost, o host e port serão avaliados para o padrão de acordo com o "type" do banco de dados
+  - Por exemplo, o type `postgresql` tem como valores padrão:
+
+  ```js
+  //mikro-orm.config.ts
+  {
+    host: 'localhost',
+    port: '5432'
+  }
+  ```
+
+  </details>
+
+<br/>
+
+<details>
 <summary>Entities do banco de dados</summary>
 
 > ### Entities são responsáveis por fazer a interação do serviço nodejs com o banco de dados através da dependencia `MikroORM`
@@ -37,21 +58,21 @@
 
 ---
 
-## Graph-QL
+## GraphQL
 
 <details>
-<summary>Types no Graph-QL</summary>
+<summary>Types</summary>
 
-> ### Types permitem que o Graph-QL possa realizar a introspecção de dados e mapeiam os tipos de dados presentes no Graph-QL
+> ### Types permitem que o GraphQL possa realizar a introspecção de dados e mapeiam os tipos de dados presentes no GraphQL
 
 <br/>
 
 > ### **Como criar**
 >
-> - **O type do Graph-QL é criado a partir da entity do MikroORM**
->   - **Siga o tutorial de como criar a Entity antes de transformá-la em um Graph-QL Type**
+> - **O type do GraphQL é criado a partir da entity do MikroORM**
+>   - **Siga o tutorial de como criar a Entity antes de transformá-la em um GraphQL Type**
 > - Adicione a `@ObjectType()` notation na classe de entity
-> - Adicione `@Field()` para quais campos da entity devem ser expostos pelo Graph-QL
+> - Adicione `@Field()` para quais campos da entity devem ser expostos pelo GraphQL
 > - use `@Field(() => tipo)` para especificar o tipo do parâmetro (necessario em alguns > tipos de dados como Date e outro types criados (relacionamentos))
 
 </details>
@@ -59,9 +80,9 @@
 <br/>
 
 <details>
-<summary>Resolvers para o Graph-QL</summary>
+<summary>Resolvers</summary>
 
-> ### Resolvers contém a lógica executada quando uma chamada é feita ao Graph-QL e retorna os dados necessários
+> ### Resolvers contém a lógica executada quando uma chamada é feita ao GraphQL e retorna os dados necessários
 
 <br/>
 
@@ -105,24 +126,65 @@
 > //YourResolver.ts
 > @Query() //ou @Mutation()
 > metodo(
->   @Arg("nomeDoArgumento", () => TipoDoArgumento) nomeDaVariavelNoResolver: tipoDaVariavelNoResolver,
+>   @Arg("nomeArg", () => TipoArg) nomeVarNoResolver: tipoVarNoResolver,
 >   ...outrosArgumentos
 > ){
->   nomeDaVariavelNoResolver //Como acessar
+>   nomeVarNoResolver //Chamar diretamente
 >   //Código a ser executado
-> }]
+> }
 > ```
 >
+> > #### **Atenção**
+> >
+> > - O trecho `() => TipoArg` é opcional. Em alguns casos, o TypeScript consegue associar o tipo da variável ao tipo do argumento automaticamente.
+> > - Nesse caso, o código seria alterado para:
+> >
+> > ```js
+> > @Arg("nomeArg") nomeVarNoResolver: tipoVarNoResolver //Associa o tipoVarNoResolver automaticamente
+> > ```
+> >
+> > - Isso normalmente funciona com tipos básicos de variaveis (`number`, `string`, etc) e com `InputTypes`
+>
 > - Para todos os efeitos, se faz um mapeamento entre o nome do argumento recebido no GraphQL para uma variavel que será usada no corpo do método
+> - Também pode fazer uso de `InputTypes` quando o mesmo formato de parâmetros é usado multiplas vezes. Veja a proxima seção para saber como criar um `InputType`
 
 </details>
+
+<br/>
+
+<details>
+<summary>Input Types</summary>
+
+> ### Quando for passar parâmetros para uma operação no GraphQL, pode-se criar InputTypes para melhor compor o >código
+
+ <br/>
+
+> ### **Como criar**
+>
+> - Normalmente o `InputType` é usado dentro de um Resolver para obter dados de um determinado `Type`. Por esse motivo, a melhor prática é inserir o código do `InputType` dentro do arquivo do `Resolver` > > correspondente.
+> - O arquivo de `InputType` é parecido com o arquivo de `Type`, porém a anotação usada muda:
+>
+> ```js
+> //resolver.ts
+> @InputType()
+> class InputTypeName {
+>   @Field()
+>   field1!: string;
+>   @Field()
+>   field2!: string;
+> }
+> //Resto do código
+> ```
+
+</details>
+
 <br/>
 <details>
-<summary>Objeto de Contexto Graph-QL</summary>
+<summary>Contexto Global</summary>
 
-> ### O Graph-QL possui um objeto de contexto com variáveis que podem ser acessadas por qualquer resolvers
+> ### O GraphQL possui um objeto de contexto com variáveis que podem ser acessadas por qualquer resolvers
 
-<br/>
+ <br/>
 
 > ### **Como acessar os dados**
 >
