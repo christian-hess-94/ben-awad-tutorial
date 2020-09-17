@@ -1,3 +1,57 @@
+## Iniciando
+
+<details>
+<summary>Dependencias</summary>
+
+- **@mikro-orm**: Para fazer requisições e interações com o banco de dados
+  - **/cli /core /migrations /postgresql**: Diversos módulos do mikroORM
+- **pg**: driver para permitir a conexão com banco de dados PosgreSQL
+- **express**: Criação de web services
+- **express Session**: Permite a criação de cookies e persistencia de sessões no serviço web Express
+- **redis / connect-redis**: Banco de dados local para criação de cookies e sessão
+- **apollo-server-express**: Middleware do Express que permite a criação de APIs Apollo GraphQL
+- **graphql / type-graphQL**: Permite a criação de API GraphQL com suporte a sintaxe do Typescript
+- **typescript / ts-node**: Permite o uso da sintaxe do typescript com um projeto NodeJS puro
+- **argon2**: Biblioteca de criptografia de dados
+- **reflect-metadata**: Permite o uso de Anotattions, providas por outras dependencias, dentro de classes JS
+- **nodemon**: habilita live-reload ao serviço toda vez que algum arquivo for modificado
+
+</details>
+<br/>
+<details>
+<summary>Instalar dependencias e programas</summary>
+
+Execute o comando `yarn` na root do sistema
+
+Será necessário instalar o servidor _redis_ para garantir que a sessão possa ser criada:
+
+**No windows**
+
+- Acesse o link: https://github.com/microsoftarchive/redis/releases
+- Baixe a ultima versão (3.2.100)
+- Extraia o .rar para algum local da máquina
+- Adicione a pasta nas variáveis de ambiente
+
+**No Linux / macOS**
+-- Siga instruções em: https://redis.io/
+
+</details>
+<br/>
+<details>
+<summary>Executar o código</summary>
+
+Siga os três passo abaixo para executar o arquivo
+
+1. Execute o comando `redis-server`
+1. Inicia o serviço do redis para criação de sessões. Requer redis instalado
+1. Em outro terminal, execute o comando `yarn watch`
+1. Faz o transpile de arquivo .ts para arquivos .js dentro da pasta dist
+1. Em outro terminal, execute o comando `yarn nodemon-js`
+1. Inicia o projeto a partir do arquivo `index.ts` com o serviço do **nodemon**
+</details>
+
+---
+
 ## MikroORM
 
 <details>
@@ -182,11 +236,19 @@
 <details>
 <summary>Contexto Global</summary>
 
-> ### O GraphQL possui um objeto de contexto com variáveis que podem ser acessadas por qualquer resolvers
+> ### O GraphQL possui um objeto de contexto com variáveis que podem ser acessadas por qualquer `Resolver`
 
  <br/>
 
-> ### **Como acessar os dados**
+### **Variáveis padrões**
+
+Existem alguns valores padrões a serem acessados no context. São eles:
+
+- em: EntityManager do MikroORM, serve para fazer transações com o banco de dados
+- req: Objeto com as informações da requisição recebida. também possui as informações da sessão feita pelo Redis (Cookies)
+- res: Objeto que compõe a resposta enviada pelo servidor
+
+> ### **Como acessar uma variável**
 >
 > - No resolver, adicione o seguinte código como um dos parâmetros do método:
 >
@@ -194,15 +256,15 @@
 > //YourResolver.ts
 > @Query(() => Type)
 > metodo(@Ctx() ctx: MyContext){ //Adicione isto
-> ctx.variavel_a_ser_acessada;
-> //Resto do código
+>   ctx.variavel_a_ser_acessada; //Por exemplo, ctx.em, ctx.req, ctx.res, etc
+>   //Resto do código
 > }
 > ```
 
-> ### **Como adicionar novos valores no contexto**
+> ### **Como adicionar novas variáveis no contexto**
 >
-> - Abra o arquivo `src/types`
-> - Dentro da classe `MyContext`, adicione um novo parâmetro e especifique seu tipo
+> - Abra o arquivo `src/types.ts`
+> - Dentro da classe `MyContext`, adicione um novo parâmetro e especifique seu tipo (Importe a classe que determina o tipo)
 > - Abra o arquivo `index.ts`
 > - Dentro da função `main()` adicione a variável dentro do parâmetro `context` do ApolloServer:
 >
@@ -218,3 +280,5 @@
 </details>
 
 ---
+
+## Redis (Cookies)

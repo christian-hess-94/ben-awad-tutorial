@@ -91,7 +91,7 @@ export class UserResolver {
   @Mutation(() => UserResponse, { nullable: true })
   async login(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse | null> {
     const user = await em.findOne(User, { username: options.username });
     if (!user) {
@@ -106,6 +106,7 @@ export class UserResolver {
     }
     const valid = await argon2.verify(user.password, options.password);
     if (valid) {
+      req.session.userId = user.id; //salvando dado da sessão
       return {
         user,
       };

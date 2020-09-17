@@ -112,7 +112,7 @@ let UserResolver = class UserResolver {
             };
         });
     }
-    login(options, { em }) {
+    login(options, { em, req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield em.findOne(User_1.User, { username: options.username });
             if (!user) {
@@ -127,6 +127,7 @@ let UserResolver = class UserResolver {
             }
             const valid = yield argon2.verify(user.password, options.password);
             if (valid) {
+                req.session.userId = user.id;
                 return {
                     user,
                 };
